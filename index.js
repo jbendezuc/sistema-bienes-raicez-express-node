@@ -1,22 +1,15 @@
 import express from 'express';
-
+import usuarioRoutes from './routes/usuarioRoutes.js';
 
 //Crear la App
 const app = express();
 
+//Habilitar Template - Engine
+app.set('view engine','pug');
+app.set('views', './views');
 
 //Routing
-app.get('/', function(req,res){
-    res.send('Informacion Texto Plano');
-})
-
-app.get('/nosotros', function(req,res){
-    res.json({
-        "nombre":"Jose",
-        "DNI":7551
-    });
-})
-
+app.use('/auth',usuarioRoutes);             //usar "use" permite escanear todas las rutas q inicien con use
 
 
 //Definir un puerto y arrancar el proyecto
