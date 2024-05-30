@@ -8,6 +8,9 @@ const app = express();
 app.set('view engine','pug');
 app.set('views', './views');
 
+//Carpeta Publica para que reconozca todo los archivos staticos css/img/js
+app.use(express.static('public'));
+
 //Routing
 app.use('/auth',usuarioRoutes);             //usar "use" permite escanear todas las rutas q inicien con use
 
