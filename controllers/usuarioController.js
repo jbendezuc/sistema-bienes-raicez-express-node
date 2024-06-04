@@ -19,7 +19,7 @@ const registrar = async (req,res) => {
     await check('nombre').notEmpty().withMessage('El Nombre no puede ir vacio').run(req);
     await check('email').isEmail().withMessage('Eso no es un Email').run(req);
     await check('password').isLength({min:6}).withMessage('Minimo 6 caracteres').run(req);
-    await check('repetir_password').equals('password').withMessage('El password no coincide').run(req);
+    await check('repetir_password').equals(req.body.password).withMessage('El password no coincide').run(req);
 
     let resultado = validationResult(req);
 
@@ -36,8 +36,23 @@ const registrar = async (req,res) => {
         })
     }
     
-    
-
+    //validacion de que no se repita los emails
+    //Busqueda de un usuario
+    const {nombre,email,password} = req.body;
+    //const usuarioExiste = await Usuario.findOne({where: {email: req.body.email}});
+    const usuarioExiste = await Usuario.findOne({where: {email}});
+    if(usuarioExiste){
+        return res.render('auth/registro',{
+            pagina:"Crear Cuenta",
+            errores: [{
+                msg: "El usuario Ya existe"
+            }],
+            usuario: {
+                nombre: req.body.nombre,
+                email: req.body.email
+            }
+        })
+    }
     //Crear un Usuario
     const usuario = await Usuario.create(req.body);
     res.json(usuario);
