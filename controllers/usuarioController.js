@@ -25,12 +25,19 @@ const registrar = async (req,res) => {
 
     //Verificar que el resultado este vacio, si es false, q return
     if(!resultado.isEmpty()){
+
         return res.render('auth/registro',{
             pagina: "Crear Cuenta",
-            errores: resultado.array()
+            errores: resultado.array(),  //retorna los errores en formato array
+            usuario: {
+                nombre: req.body.nombre,
+                email: req.body.email
+            }
         })
     }
     
+    
+
     //Crear un Usuario
     const usuario = await Usuario.create(req.body);
     res.json(usuario);
