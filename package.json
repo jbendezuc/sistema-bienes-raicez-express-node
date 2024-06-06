@@ -19,6 +19,7 @@
     "express": "^4.19.2",
     "express-validator": "^7.1.0",
     "mysql2": "^3.9.9",
+    "nodemailer": "^6.9.13",
     "pug": "^3.0.3",
     "sequelize": "^6.37.3"
   },
