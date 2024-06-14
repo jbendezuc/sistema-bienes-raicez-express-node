@@ -27,4 +27,9 @@ const Usuario = db.define('usuarios',{
     }
 })
 
+//Validar el password hasheado con el plano, Creamos un prototype llamado verificarPassword
+Usuario.prototype.verificarPassword = function(password){
+    return bcrypt.compareSync(password,this.password)
+}
+
 export default Usuario;

@@ -1,13 +1,69 @@
 import { check,validationResult } from "express-validator";
 import bcrypt from "bcrypt"
 import Usuario from "../models/Usuario.js";
-import {generarId} from "../helpers/tokens.js";
+import {generarId,generarJWT} from "../helpers/tokens.js";
 import {emailRegistro,emailOlvidePassword} from '../helpers/emails.js';
 
 const formularioLogin = (req,res) => {
     res.render('auth/login',{
-        pagina: "Inciar Sesion"
+        pagina: "Inciar Sesion",
+        csrfToken: req.csrfToken()
     });
+}
+
+const autenticar = async(req,res) => {
+    //Validar Inputs
+    await check('email').isEmail().withMessage('Obligatorio un Email').run(req);
+    await check('password').notEmpty().withMessage('Obligatorio una Contraseña').run(req);
+
+    //Mostrar los resultados de la validacion
+    let resultado = validationResult(req);
+
+    if (!resultado.isEmpty()) {
+        return res.render('auth/login',{
+            pagina: "Inciar Sesión",
+            csrfToken: req.csrfToken(),
+            errores: resultado.array()
+        })
+    }
+
+    //Consultar si existe el usuario
+    const {email,password} = req.body;
+    const usuario = await Usuario.findOne({where: {email}})
+
+    if(!usuario){
+        return res.render('auth/login',{
+            pagina: "Iniciar Sesión",
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "El email no existe"}]
+        })
+    }
+
+    //Validar si el usuario esta confirmado
+    if(!usuario.confirmado){
+        return res.render('auth/login',{
+            pagina: "Iniciar Sesión",
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "Falta confirmar el correo" }]
+        })
+    }
+    
+    //Comparar Contraseña Hasheadas vs Plano
+    if(!usuario.verificarPassword(password)){
+        return res.render('auth/login',{
+            pagina: "Iniciar Sesión",
+            csrfToken: req.csrfToken(),
+            errores: [{msg: "Contraseña Incorrecta" }]
+        })
+    }
+
+    const token = generarJWT({id:usuario.id,nombre:usuario.nombre});
+
+    return res.cookie('_token',token,{
+        httpOnly:true,
+        secure: true,
+        sameSite: true
+    }).redirect('/mis-propieades');
 }
 
 const formularioRegistro = (req,res) => {
@@ -224,6 +280,7 @@ const restaurarPassword = async(req,res) => {
 
 export {
     formularioLogin,
+    autenticar,
     formularioRegistro,
     registrar,
     confirmarEmail,
