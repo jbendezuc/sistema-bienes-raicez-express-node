@@ -1,6 +1,8 @@
+
 (function() {
-    const lat = -11.985492;
-    const lng = -77.099778;
+    //Usamos || porque el valor no es Null sino Vacio ''
+    const lat = document.querySelector('#lat').value || -11.985492;
+    const lng = document.querySelector('#lng').value || -77.099778;
     const mapa = L.map('mapa').setView([lat, lng ], 16);            //Instacia el mapa y le guarda el div con id MAPA
     let marker;
 
@@ -31,7 +33,7 @@
         
         //Llenar Campos del Dom
         document.querySelector('.calle').textContent = resultado?.address?.Address ?? '';
-        document.querySelector('#calle').textContent = resultado?.address?.Address ?? '';
+        document.querySelector('#calle').value = resultado?.address?.Address ?? '';
         document.querySelector('#lat').value = resultado?.latlng?.lat ?? '';
         document.querySelector('#lng').value = resultado?.latlng?.lng ?? '';
         })

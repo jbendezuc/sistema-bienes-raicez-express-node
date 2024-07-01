@@ -1,4 +1,4 @@
-import { check,validationResult } from "express-validator";
+import { check,validationResult } from "express-validator";         //Check para validar en el Controller
 import bcrypt from "bcrypt"
 import Usuario from "../models/Usuario.js";
 import {generarId,generarJWT} from "../helpers/tokens.js";
