@@ -60,8 +60,10 @@ const guardar = async(req,res) => {
     //Guardar en la tabla Propiedades
     const {titulo, descripcion, habitaciones,estacionamiento,wc,calle,lat,lng, precio: precioID, categoria: categoriaID} = req.body;
 
+    const {id: usuarioID} = req.usuario;             //Recuperamos la variable global creada en el middleware ProtecionRuta, toda la info del usuario
+
     try {
-        const propiedadGuardada = await Propiedad.create({
+        const propiedadGuardada = await Propiedad.create({              //Cuando realizamos un Guardado en la BD, genera una copia en una variable
             titulo,
             descripcion,
             habitaciones,
@@ -71,16 +73,29 @@ const guardar = async(req,res) => {
             lat,
             lng,
             precioID,
-            categoriaID
-        })       
+            categoriaID,
+            usuarioID,
+            imagen: ''
+        }) 
+        
+    const {id} = propiedadGuardada;
+
+    //Redireccionamos a la Ruta, todo salio OK
+    res.redirect(`/propiedades/agregar-imagen/${id}`);
+
     } catch (error) {
         console.log(error);
     }
 
 }
 
+const agregarImagen = (req,res) => {
+    res.send('Guarda tus Imagenes');
+}
+
 export {
     admin,
     crear,
-    guardar
+    guardar,
+    agregarImagen
 }

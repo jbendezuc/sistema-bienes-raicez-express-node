@@ -49,7 +49,7 @@ const autenticar = async(req,res) => {
     }
     
     //Comparar Contraseña Hasheadas vs Plano
-    if(!usuario.verificarPassword(password)){
+    if(!usuario.verificarPassword(password)){           //Se creo un prototype en el model usuario
         return res.render('auth/login',{
             pagina: "Iniciar Sesión",
             csrfToken: req.csrfToken(),
@@ -156,7 +156,7 @@ const confirmarEmail = async (req,res) => {
     usuario.token = null;
     usuario.confirmado = true;
 
-    await usuario.save();
+    await usuario.save();           //EDITAR los cambios en la BD
 
     res.render('auth/confirmar-cuenta',{
         pagina: "Cuenta Confirmada",

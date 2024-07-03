@@ -3,8 +3,10 @@ import categorias from './categorias.js'
 /* import Categoria from '../models/Categoria.js' */
 import precios from './precios.js'
 /* import Precio from '../models/Precio.js' */
-import {Categoria,Precio, Propiedad} from '../models/index.js';
+import usuarios from './usuarios.js';
+import {Categoria,Precio, Propiedad, Usuario} from '../models/index.js';
 import db from '../config/db.js'
+
 
 const importarDatos = async () => {
     try {
@@ -17,7 +19,8 @@ const importarDatos = async () => {
         //Insertar Datos (crea todo los datos que estan en categorias)     
         await Promise.all([
             Categoria.bulkCreate(categorias),   //todos los datos de categorias
-            Precio.bulkCreate(precios)          //todos los datos de precios
+            Precio.bulkCreate(precios),          //todos los datos de precios
+            Usuario.bulkCreate(usuarios)
         ]);
 
         console.log('Datos Importados Correctamente');
@@ -45,7 +48,7 @@ const eliminarDatos = async() => {
        ]); */
         await Precio.destroy({where:{}, truncate:true});
         await Categoria.destroy({where:{}, truncate:true})  
-
+        await Usuario.destroy({where:{}, truncate:true})  
         //Activar  la restriccion de foreignKey
         await Propiedad.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
 
