@@ -7,8 +7,7 @@ import Precio from "../models/Precio.js" */
 const admin = (req,res) => {
 
     res.render('propiedades/admin',{
-        pagina: "Mis Propiedades",
-        barra: true
+        pagina: "Mis Propiedades"
     })
 
 }
@@ -90,7 +89,17 @@ const guardar = async(req,res) => {
 }
 
 const agregarImagen = (req,res) => {
-    res.send('Guarda tus Imagenes');
+
+    //Validar que la Propiedad Exista
+
+    //Validar que no este Publicada
+
+    //Validar que la Propiedad pertenece a quien visita la Pagina
+    
+    res.render('propiedades/agregar-imagen',{
+        pagina: "Agregar Imagen",
+        csrfToken: req.csrfToken()
+    })
 }
 
 export {
