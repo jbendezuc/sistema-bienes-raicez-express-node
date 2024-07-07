@@ -1,7 +1,8 @@
 import express from 'express';
 import { body } from 'express-validator'; //Validar Formularios en las RUTAS
-import {admin,crear,guardar, agregarImagen} from '../controllers/propiedadController.js';
+import {admin,crear,guardar, agregarImagen,almacenarImagen} from '../controllers/propiedadController.js';
 import protegerRuta from '../middleware/protegerRuta.js';
+import upload from '../middleware/subirImagen.js';
 
 const router = express.Router();
 
@@ -16,7 +17,8 @@ router.post('/propiedad/crear',
     body('habitaciones').isNumeric().withMessage('Selecciona la cantidad de Habitaciones'),
     body('estacionamiento').isNumeric().withMessage('Selecciona la cantidad de Estacionamiento'),
     body('wc').isNumeric().withMessage('Selecciona la cantidad de WC')
-    ,guardar) //Routa para Guardar en la BD del formulario
-router.get('/propiedades/agregar-imagen/:id', agregarImagen)
+    ,protegerRuta,guardar)                             //Routa para Guardar en la BD del formulario
+router.get('/propiedades/agregar-imagen/:id', protegerRuta, agregarImagen)
+router.post('/propiedades/agregar-imagen/:id', protegerRuta, upload.single('imagen'), almacenarImagen ) //upload('imagen'), reconoce que se esta cargado un archivo de un elemento con nombre "imagen" = al form
 
 export default router

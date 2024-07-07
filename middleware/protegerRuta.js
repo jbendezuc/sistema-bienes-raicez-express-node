@@ -17,7 +17,7 @@ const protegerRuta = async (req,res,next) => {
         
         const decoded = jwt.verify(_token, process.env.TOKEN_CLAVE)     //Verificacion del Token de los Cookies y decodifica
         const usuario = await Usuario.scope('eliminarPassword').findByPk(decoded.id)
-
+        
         //Almacenar el usuario al Req
         if(usuario){
             req.usuario = usuario;                                  //Crea una variable global para usarlo en todos los req.
