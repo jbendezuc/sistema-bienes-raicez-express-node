@@ -16,6 +16,18 @@ const Propiedad = db.define('propiedades',{
         type: DataTypes.TEXT,
         allowNull: false
     },
+    habitaciones:{
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    estacionamiento:{
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    wc:{
+        type:DataTypes.INTEGER,
+        allowNull: false
+    },
     calle:{
         type: DataTypes.STRING(60),
         allowNull: false
