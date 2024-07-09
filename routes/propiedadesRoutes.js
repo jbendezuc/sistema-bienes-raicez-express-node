@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator'; //Validar Formularios en las RUTAS
-import {admin,crear,guardar, agregarImagen,almacenarImagen,editar, guardarCambios} from '../controllers/propiedadController.js';
+import {admin,crear,guardar, agregarImagen,almacenarImagen,editar, guardarCambios, eliminar} from '../controllers/propiedadController.js';
 import protegerRuta from '../middleware/protegerRuta.js';
 import upload from '../middleware/subirImagen.js';
 
@@ -31,5 +31,5 @@ router.post('/propiedades/editar/:id',
     body('estacionamiento').isNumeric().withMessage('Selecciona la cantidad de Estacionamiento'),
     body('wc').isNumeric().withMessage('Selecciona la cantidad de WC')
     , protegerRuta, guardarCambios)                    //Routa para Actualizar Cambios en la BD del formulario
-
+router.post('/propiedades/eliminar/:id', protegerRuta, eliminar) //Routa para Eliminar en la BD
 export default router

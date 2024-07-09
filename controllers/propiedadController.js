@@ -1,4 +1,5 @@
 import { validationResult } from "express-validator"
+import {unlink} from "node:fs/promises"         //permite encontrar la Ruta y eliminar un archivo del DISCO DURO
 import {Categoria,Precio,Propiedad} from "../models/index.js"
 /* import Categoria from "../models/Categoria.js"
 import Precio from "../models/Precio.js" */
@@ -21,7 +22,8 @@ const admin = async (req,res) => {
 
     res.render('propiedades/admin',{
         pagina: "Mis Propiedades",
-        propiedades
+        propiedades,
+        csrfToken: req.csrfToken(),
     })
 
 }
@@ -204,7 +206,6 @@ const editar = async(req,res) => {
 }
 
 const guardarCambios = async(req,res) => {
-    console.log('guardando cambios');
 
     //Validacion de Formulario - Mostrar mensajes de Validacion, desde la Ruta
     let resultado = validationResult(req);
@@ -269,6 +270,33 @@ const guardarCambios = async(req,res) => {
     }
 }
 
+const eliminar = async(req,res) => {
+    
+    //Validar que la Propiedad Exista
+    const { id } = req.params;
+
+    //Buscar si la Propiedad Existe
+    const propiedad = await Propiedad.findByPk(id); //Busqueda por Primary Key
+
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+
+    //Validar que la Propiedad pertenece a quien visita la Pagina
+    if(req.usuario.id.toString() !== propiedad.usuarioID.toString() ){
+        return res.redirect('/mis-propiedades');
+    }
+    
+    //Eliminando la Imagen del Disco Duro
+    await unlink(`public/uploads/${propiedad.imagen}`)  //Unlik se importa para poder ser usado
+
+    //Eliminando los datos de la BD
+    await propiedad.destroy();
+
+    res.redirect('/mis-propiedades');
+
+}
+
 export {
     admin,
     crear,
@@ -276,5 +304,6 @@ export {
     agregarImagen,
     almacenarImagen,
     editar,
-    guardarCambios
+    guardarCambios,
+    eliminar
 }
