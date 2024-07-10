@@ -297,6 +297,28 @@ const eliminar = async(req,res) => {
 
 }
 
+//Mostrar Propiedad AREA PUBLICA
+const mostrarPropiedad = async(req,res) => {
+
+    //Validar que la Propiedad Exista
+    const {id} = req.params;
+
+    //Buscar si la Propiedad Existe
+    const propiedad = await Propiedad.findByPk(id,{include:[
+            { model: Categoria, as:'categoria' },
+            { model: Precio, as:'precio' }
+        ]});
+
+    if(!propiedad){
+        return res.redirect('/404');
+    }
+
+    res.render('propiedades/mostrar',{
+        pagina: propiedad.titulo,
+        propiedad
+    });
+}
+
 export {
     admin,
     crear,
@@ -305,5 +327,6 @@ export {
     almacenarImagen,
     editar,
     guardarCambios,
-    eliminar
+    eliminar,
+    mostrarPropiedad
 }

@@ -10,6 +10,7 @@
     //Utiliar Provider y Geocoder
     const geocodeService = L.esri.Geocoding.geocodeService();       //Instanciamos, geocodeServices, esto lo obtenemos de los SCRIPT
 
+    //Esta permite que se muestre los mapas/(NECESARIO)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapa);
