@@ -7,24 +7,75 @@ import Precio from "../models/Precio.js" */
 
 const admin = async (req,res) => {
 
-    const {id} = req.usuario;
+    //OBTENER EL QUERY-STRING => necesario para el paginador
+        //const pagina = req.query
+    const { pagina: paginaActual} = req.query;
+    
+    //creas una expresion para validar el Paginador
+    const expresion = /^[0-9]$/;
+    
+    if (!expresion.test(paginaActual)) {    //si no es un numero, que redireccione
+        return res.redirect('/mis-propiedades?pagina=1');
+    }
 
-    //Busqueda por usuario, todos los datos q le pertenecen
-    const propiedades = await Propiedad.findAll({
-        where:{
-            usuarioID: id
-        }, //INNER JOIN en SQLIZE para mostrar tablas relacionadas
-        include:[
-            { model: Categoria, as:'categoria' },
-            { model: Precio, as:'precio' }
-        ]
-    })
+    try {
+        
+        const {id} = req.usuario;
 
-    res.render('propiedades/admin',{
-        pagina: "Mis Propiedades",
-        propiedades,
-        csrfToken: req.csrfToken(),
-    })
+        //Limites y Offset para el paginador
+        const limit = 10;   //limite por consulta
+        const offset = ((paginaActual * limit) - limit); //cuantos registros se va a saltar para mostrar, los 10 primeros, los 20 primeros
+
+        //Busqueda por usuario, todos los datos q le pertenecen
+        /* const propiedades = await Propiedad.findAll({
+            limit,
+            offset,
+            where:{
+                usuarioID: id
+            }, //INNER JOIN en SQLIZE para mostrar tablas relacionadas
+            include:[
+                { model: Categoria, as:'categoria' },
+                { model: Precio, as:'precio' }
+            ]
+        }) */
+
+        //Busqueda por usuario, todos los datos q le pertenecen
+        //Busqueda de la cantida de registros que hay "COUNT"
+        const [propiedades, total] = await Promise.all([
+            Propiedad.findAll({
+                limit,
+                offset,
+                where:{
+                    usuarioID:id
+                },
+                include:[
+                    {model: Categoria, as: 'categoria'},
+                    {model: Precio, as: 'precio'}
+                ]
+            }),
+            Propiedad.count({
+                where:{
+                    usuarioID: id
+                }
+            })
+            
+        ]);
+
+        res.render('propiedades/admin',{
+            pagina: "Mis Propiedades",
+            propiedades,
+            csrfToken: req.csrfToken(),
+            paginas: Math.ceil( total / limit ),
+            paginaActual: Number(paginaActual),
+            total,
+            offset,
+            limit   
+        })
+    } catch (error) {
+        console.log(error);
+    }
+
+    
 
 }
 
