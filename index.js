@@ -1,6 +1,8 @@
 import express from 'express';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import propiedadesRoutes from './routes/propiedadesRoutes.js';
+import appRoutes from './routes/appRoutes.js';
+import apiRoutes from './routes/apiRoutes.js';
 import db from './config/db.js';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
@@ -36,8 +38,10 @@ app.set('views', './views');
 app.use( express.static('public') );
 
 //Routing
+app.use('/',appRoutes);                     //en el archivo appRoutes, se llama router, pero se puede modificar el nombre al importar cuando es por Default
 app.use('/auth',usuarioRoutes);             //usar "use" permite escanear todas las rutas q inicien con use
 app.use('/',propiedadesRoutes);             //usar "use" permite escanear todas las rutas que inicien con "/""
+app.use('/api',apiRoutes)                   //Activar la Routa API
 
 //Definir un puerto y arrancar el proyecto
 const port = process.env.PORT || 3000;
