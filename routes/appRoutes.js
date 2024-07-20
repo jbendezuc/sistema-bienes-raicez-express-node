@@ -8,13 +8,12 @@ const router = express.Router();
 router.get('/', inicio);
 
 //Categoria
-router.get('/categoria/:id', categoria);
+router.get('/categorias/:id', categoria);
 
 //404
 router.get('/404', noEncontrado);
 
 //Buscador
-router.post('/buscador/:id', buscador)
-
+router.post('/buscador', buscador);
 
 export default router;
