@@ -1,9 +1,9 @@
 import { validationResult } from "express-validator"
 import {unlink} from "node:fs/promises"         //permite encontrar la Ruta y eliminar un archivo del DISCO DURO
-import {Categoria,Precio,Propiedad} from "../models/index.js"
+import {Categoria,Mensaje,Precio,Propiedad, Usuario} from "../models/index.js"
 /* import Categoria from "../models/Categoria.js"
 import Precio from "../models/Precio.js" */
-
+import {esVendedor,formatearFecha} from '../helpers/index.js';
 
 const admin = async (req,res) => {
 
@@ -49,8 +49,9 @@ const admin = async (req,res) => {
                     usuarioID:id
                 },
                 include:[
-                    {model: Categoria, as: 'categoria'},
-                    {model: Precio, as: 'precio'}
+                    {model: Categoria, as: 'categoria'},    //en singular poq es relacion 1-1 categoria
+                    {model: Precio, as: 'precio'},          //en singular poq es relacion 1-1 categoria
+                    {model: Mensaje, as: 'mensajes'}        //en plural poq es relacion 1-N mensajes
                 ]
             }),
             Propiedad.count({
@@ -354,6 +355,8 @@ const mostrarPropiedad = async(req,res) => {
     //Validar que la Propiedad Exista
     const {id} = req.params;
 
+    
+
     //Buscar si la Propiedad Existe
     const propiedad = await Propiedad.findByPk(id,{include:[
             { model: Categoria, as:'categoria' },
@@ -368,7 +371,95 @@ const mostrarPropiedad = async(req,res) => {
         pagina: propiedad.titulo,
         propiedad,
         csrfToken: req.csrfToken(),
+        usuario: req.usuario,
+        esVendedor: esVendedor(req.usuario?.id,propiedad.usuarioID) //Option Changes req.usuario?.id ???????????????????????
     });
+}
+
+const enviarMensaje = async (req,res) => {
+    
+    //Validar que la Propiedad Exista
+    const {id} = req.params;
+
+    //Buscar si la Propiedad Existe
+    const propiedad = await Propiedad.findByPk(id,
+        {include:[
+            { model: Categoria, as:'categoria' },
+            { model: Precio, as:'precio' }
+        ]});
+
+    if(!propiedad){
+        return res.redirect('/404');
+    }
+
+    //Renderizar Errores
+    //Mostrar mensajes de Validacion, desde la Ruta
+    let resultado = validationResult(req);
+
+    if(!resultado.isEmpty()){
+
+         return res.render('propiedades/mostrar',{
+            pagina: propiedad.titulo,
+            propiedad,
+            csrfToken: req.csrfToken(),
+            usuario: req.usuario,
+            esVendedor: esVendedor(req.usuario?.id,propiedad.usuarioId),
+            errores: resultado.array()
+        })
+    }
+
+    //Extramos los datos del formulario
+    const {mensaje} = req.body;
+    const {id: propiedadID} = req.params;
+    const {id: usuarioID} = req.usuario
+
+    //AMACENAR EL MENSAJE
+    await Mensaje.create({
+        mensaje,
+        propiedadID,
+        usuarioID
+    })
+
+    res.render('propiedades/mostrar',{
+        pagina: propiedad.titulo,
+        propiedad,
+        csrfToken: req.csrfToken(),
+        usuario: req.usuario,
+        esVendedor: esVendedor(req.usuario?.id,propiedad.usuarioID), //Option Changes req.usuario?.id ???????????????????????
+        enviado: true
+    });
+}
+
+const verMensaje = async(req,res) => {
+
+    //Validar que la Propiedad Exista
+    const { id } = req.params;
+
+    //Buscar si la Propiedad Existe
+    const propiedad = await Propiedad.findByPk(id,{
+        include:[
+            { model: Mensaje, as: 'mensajes',   //Incluimos la informacion del mensaje
+                include: [
+                    {model: Usuario, as: 'usuario'} //Incluimos la informacion del usuario que venia en el mensaje
+                ]
+            }
+        ]
+    }); 
+
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+
+    //Validar que la Propiedad pertenece a quien visita la Pagina
+    if(req.usuario.id.toString() !== propiedad.usuarioID.toString() ){
+        return res.redirect('/mis-propiedades');
+    }
+
+    res.render('propiedades/mensajes',{
+        pagina: 'Mensajes',
+        mensajes:propiedad.mensajes,
+        formatearFecha
+    })
 }
 
 export {
@@ -380,5 +471,7 @@ export {
     editar,
     guardarCambios,
     eliminar,
-    mostrarPropiedad
+    mostrarPropiedad,
+    enviarMensaje,
+    verMensaje
 }
