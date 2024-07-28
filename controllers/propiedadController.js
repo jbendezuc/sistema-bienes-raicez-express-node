@@ -349,6 +349,35 @@ const eliminar = async(req,res) => {
 
 }
 
+//Modificar el estado de la Propiedad
+const cambiarEstado = async(req,res) => {
+
+    //Validar que la Propiedad Exista
+    const { id } = req.params;
+
+    //Buscar si la Propiedad Existe
+    const propiedad = await Propiedad.findByPk(id); //Busqueda por Primary Key
+
+    if(!propiedad){
+        return res.redirect('/mis-propiedades');
+    }
+
+    //Validar que la Propiedad pertenece a quien visita la Pagina
+    if(req.usuario.id.toString() !== propiedad.usuarioID.toString() ){
+        return res.redirect('/mis-propiedades');
+    }
+
+    //Actualizar
+    propiedad.publicado = !propiedad.publicado
+
+    await propiedad.save();
+
+    res.json({
+        resultado: 'ok'
+    })
+    
+}
+
 //Mostrar Propiedad AREA PUBLICA
 const mostrarPropiedad = async(req,res) => {
 
@@ -363,7 +392,7 @@ const mostrarPropiedad = async(req,res) => {
             { model: Precio, as:'precio' }
         ]});
 
-    if(!propiedad){
+    if(!propiedad || !propiedad.publicado){
         return res.redirect('/404');
     }
 
@@ -473,5 +502,6 @@ export {
     eliminar,
     mostrarPropiedad,
     enviarMensaje,
-    verMensaje
+    verMensaje,
+    cambiarEstado
 }

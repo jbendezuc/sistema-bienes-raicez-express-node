@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator'; //Validar Formularios en las RUTAS
-import {admin,crear,guardar, agregarImagen,almacenarImagen,editar, guardarCambios, eliminar, mostrarPropiedad, enviarMensaje, verMensaje} from '../controllers/propiedadController.js';
+import {admin,crear,guardar, agregarImagen,almacenarImagen,editar, guardarCambios, cambiarEstado,eliminar, mostrarPropiedad, enviarMensaje, verMensaje} from '../controllers/propiedadController.js';
 import protegerRuta from '../middleware/protegerRuta.js';
 import upload from '../middleware/subirImagen.js';
 import identificarUsuario from '../middleware/identificarUsuario.js';
@@ -33,6 +33,9 @@ router.post('/propiedades/editar/:id',
     body('wc').isNumeric().withMessage('Selecciona la cantidad de WC')
     , protegerRuta, guardarCambios)                    //Routa para Actualizar Cambios en la BD del formulario
 router.post('/propiedades/eliminar/:id', protegerRuta, eliminar) //Routa para Eliminar en la BD
+
+//El formulario solo acepta POST como ruta
+router.put('/propiedades/:id',protegerRuta,cambiarEstado) //Modificar registros con PUT
 
 //AREA PUBLICA
 router.get('/propiedad/:id',identificarUsuario,mostrarPropiedad);
