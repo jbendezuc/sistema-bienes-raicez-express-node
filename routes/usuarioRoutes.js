@@ -1,11 +1,14 @@
 import express from 'express';
 
-import { formularioLogin,autenticar,formularioRegistro,registrar,formularioOlvidePassword,confirmarEmail,resetPassword,confirmarTokenRestauracion,restaurarPassword } from '../controllers/usuarioController.js';
+import { cerrarSesion,formularioLogin,autenticar,formularioRegistro,registrar,formularioOlvidePassword,confirmarEmail,resetPassword,confirmarTokenRestauracion,restaurarPassword } from '../controllers/usuarioController.js';
 
 const router = express.Router();
 
 router.get('/login', formularioLogin);  //Invoca la ruta para mostrar el formulario
 router.post('/login',autenticar);   //Invoca la ruta para iniciar session
+
+// Cerrar Sesion
+router.post('/cerrar-sesion',cerrarSesion)
 
 router.get('/registro', formularioRegistro);  //Invoca la ruta para mostrar el formulario
 router.post('/registro', registrar);  //Invoca la ruta para registrar DATOS
